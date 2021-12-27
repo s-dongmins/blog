@@ -4,7 +4,6 @@
 	import { hashs } from "@/Route";
 
 	import Navigation from "./components/Navigation.svelte";
-	import Posts from "./components/Posts.svelte";
 	import Root from "./routes/Root.svelte";
 	import Hash from "./routes/Hash.svelte";
 	import Setting from "./routes/Setting.svelte";
