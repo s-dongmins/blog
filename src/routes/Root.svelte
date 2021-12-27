@@ -37,14 +37,14 @@
             redirect: "follow",
         };
         const request = await fetch(
-            "https://bucv4gvvx2.execute-api.ap-northeast-2.amazonaws.com/blog/guestbook",
+            "https://api.dongmini.net/guestbook",
             requestOptions
         );
         guestbooks = [await request.json(), ...guestbooks];
     }
     async function guestbookGET() {
         const response = await fetch(
-            "https://bucv4gvvx2.execute-api.ap-northeast-2.amazonaws.com/blog/guestbook"
+            "https://api.dongmini.net/guestbook"
         );
         const json = await response.json();
         const items: Guestbook[] = json.Items.sort(
