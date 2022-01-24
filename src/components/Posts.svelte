@@ -1,38 +1,14 @@
 <script lang="ts">
-  import { hashs } from "@/Route";
+  import { path, hashs } from "@/Route";
+  import { testAPI } from "@/testdata/APITest";
+  import type { Post } from "@/testdata/Post";
 
-  interface Post {
-    title: string;
-    hashs?: Array<string>;
-    date: number;
-  }
-  let apiPosts: Array<Post> = [
-    { title: "What is python?", hashs: ["#python"], date: 20210412 },
-    {
-      title: "What is javascript?",
-      hashs: ["#javascript"],
-      date: 20210411,
-    },
-    { title: "What is cpp?", hashs: ["#cpp"], date: 20210331 },
-    { title: "python tips", hashs: ["#python"], date: 20210326 },
-    {
-      title: "How to install nodejs",
-      hashs: ["#javascript"],
-      date: 20210312,
-    },
-    { title: "cpp compiler", hashs: ["#cpp"], date: 20210224 },
-    { title: "version of cpp", hashs: ["#cpp"], date: 20210212 },
-    {
-      title: "tensorflow machine learning",
-      hashs: ["#python"],
-      date: 20210211,
-    },
-  ];
+  let posts: Post[] = testAPI("/page", "GET");
 </script>
 
 <style lang="scss">
   .container {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(6, 1fr);
     .post {
       display: flex;
@@ -59,11 +35,11 @@
 </style>
 
 <div class="container">
-  {#each apiPosts as post}
+  {#each posts as post}
     <div class="post">
       <div class="title">{post.title}</div>
       <div class="hashs">{post.hashs}</div>
-      <div class="date">{post.date}</div>
+      <div class="datetime">{post.datetime}</div>
     </div>
   {/each}
 </div>

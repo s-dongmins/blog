@@ -1,3 +1,7 @@
+import { name, email, comment, randint } from './FakeData';
+import type { Post } from './Post';
+
+
 export interface Comment {
     key: string;
     id: string;
@@ -8,56 +12,69 @@ export interface Comment {
     mbti: string;
     name: string;
     email: string;
-    content: string;
     ip: string;
+    content: string;
 }
+const mbti: string[] = [
+    'ESTJ',
+    'ESFJ',
+    'ENFJ',
+    'ENTJ',
+    'ESTP',
+    'ESFP',
+    'ENFP',
+    'ENTP',
+    'ISTP',
+    'ISFP',
+    'INFP',
+    'INTP',
+    'ISTJ',
+    'ISFJ',
+    'INFJ',
+    'INTJ',
+]
 
-function keyGen(): string {
-    return Math.random().toString(36).substr(2, 6);
-}
+
 function idGen(): string {
     return Math.random().toString(36).substr(2, 6);
 }
 function passwordGen(): string {
     return Math.random().toString(36).substr(2, 10);
 }
-function replyGen(): string {
-    return Math.floor((Math.random() * 4)) ? '' : Math.random().toString(36).substr(2, 6);
-}
 function datetimeGen(): number {
-    return (new Date()).getTime() - Math.floor(Math.random() * 10000000);
+    return (new Date()).getTime() - randint(10000000);
 }
 function mbtiGen(): string {
-    return '';
+    return randint(3) ? '' : mbti[randint(16)];
 }
 function nameGen(): string {
-    return 'steve';
+    return randint(4) ? name[randint(name.length)] : 'anonym';
 }
 function emailGen(): string {
-    return 'steve@steve.com';
-}
-function contentGen(): string {
-    return 'Lorem ipsum dolor sit amet';
+    return randint(10) ? '' : email[randint(email.length)];
 }
 function ipGen(): string {
-    return `${Math.random() * 255}.${Math.random() * 255}.${Math.random() * 255}.${Math.random() * 255}`;
+    return `${randint(255)}.${randint(255)}.${randint(255)}.${randint(255)}`;
+}
+function contentGen(): string {
+    return comment[randint(comment.length)];
 }
 
-export function CommentGenerator(num: number): Comment[] {
+export function CommentGenerator(num: number, posts: Post[]): Comment[] {
     let result: Comment[] = []
     for (let i = 0; i < num; i++) {
         let temp: Comment = {
-            key: keyGen(),
+            key: posts[randint(posts.length)].id,
             id: idGen(),
             password: passwordGen(),
-            reply: replyGen(),
+            reply: randint(4) ? '' : result[randint(result.length)].id,
             admin: false,
             datetime: datetimeGen(),
             mbti: mbtiGen(),
             name: nameGen(),
             email: emailGen(),
-            content: contentGen(),
-            ip: ipGen()
+            ip: ipGen(),
+            content: contentGen()
         };
         result.push(temp);
     }

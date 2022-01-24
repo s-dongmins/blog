@@ -3,13 +3,17 @@
   import { path } from "@/Route";
   import { hashs } from "@/Route";
 
+  import { testAPI } from "@/testdata/APITest";
+
   import Navigation from "./components/Navigation.svelte";
   import Root from "./routes/Root.svelte";
   import Hash from "./routes/Hash.svelte";
   import Setting from "./routes/Setting.svelte";
   import NotFound from "./routes/NotFound.svelte";
+  import Post from "./components/Posts.svelte";
+  import Posts from "./components/Posts.svelte";
 
-  window.onpopstate = function (event) {
+  window.onpopstate = function (event: any) {
     $path = (event.state && event.state.path) ?? [routerMap.root];
     $hashs = window.location.hash
       .slice(1)
@@ -73,3 +77,4 @@
 {:else}
   <NotFound />
 {/if}
+<Posts />
