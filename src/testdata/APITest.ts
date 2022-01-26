@@ -24,18 +24,16 @@ const posts = PostGenerator(100);
 const comments = CommentGenerator(300, posts);
 
 export function testAPI(query: string, method: string, body: any = {}): any {
-    const paths: string[] = query.split('/');
-    switch (paths[1]) {
-        case 'post':
-            return post(query.slice(5), method, body);
-        case 'comment':
-            return comment(query.slice(8), method, body);
-        case 'page':
-            return page(query.slice(5), method);
-        case 'hashmap':
-            return hashmap(query.slice(8), method);
-        default:
-            throw new SyntaxError("Invalid Query");
+    if (query.startsWith('/post')) {
+        return post(query.slice(5), method, body);
+    } else if (query.startsWith('/comment')) {
+        return comment(query.slice(8), method, body);
+    } else if (query.startsWith('/page')) {
+        return page(query.slice(5), method);
+    } else if (query.startsWith("/hashmap")) {
+        return hashmap(query.slice(8), method);
+    } else {
+        throw new SyntaxError("Invalid Query in testAPI");
     }
 }
 
@@ -137,8 +135,23 @@ function page(query: string, method: string = 'GET') {
     switch (method) {
         case "GET":
             const pageCount = 10;
-            posts.sort((a, b) => b.datetime - a.datetime);
-            return posts.slice((page - 1) * pageCount, page * pageCount);
+            if (tag === '') {
+                posts.sort((a, b) => b.datetime - a.datetime);
+                return posts.slice((page - 1) * pageCount, page * pageCount);
+            } else {
+                const tagList: string[] = tag.split(",").map((elem) => elem + ",");
+                let result: Post[] = posts.filter((elem) => {
+                    let flag = true;
+                    for (let t of tagList) {
+                        if (!elem.hashs.includes(t)) {
+                            flag = false;
+                        }
+                    }
+                    return flag;
+                });
+                result.sort((a, b) => b.datetime - a.datetime);
+                return result.slice((page - 1) * pageCount, page * pageCount);
+            }
         default:
             throw new SyntaxError("Invalid method");
     }

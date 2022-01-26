@@ -1,17 +1,14 @@
 <script lang="ts">
-  import { routerMap } from "@/Route";
-  import { path } from "@/Route";
-  import { hashs } from "@/Route";
-
-  import { testAPI } from "@/testdata/APITest";
+  import { routerMap } from "@/assets/modules/Route";
+  import { path } from "@/assets/modules/Route";
+  import { hashs } from "@/assets/modules/Route";
 
   import Navigation from "./components/Navigation.svelte";
   import Root from "./routes/Root.svelte";
   import Hash from "./routes/Hash.svelte";
   import Setting from "./routes/Setting.svelte";
   import NotFound from "./routes/NotFound.svelte";
-  import Post from "./components/Posts.svelte";
-  import Posts from "./components/Posts.svelte";
+  import Page from "./components/Page.svelte";
 
   window.onpopstate = function (event: any) {
     $path = (event.state && event.state.path) ?? [routerMap.root];
@@ -67,7 +64,8 @@
 <div class="color2" />
 
 <Navigation />
-<div class="gap" />
+
+<!-- <div class="gap" />
 {#if $path[0] === routerMap.root}
   <Root />
 {:else if $path[0] === routerMap.hash}
@@ -76,5 +74,6 @@
   <Setting />
 {:else}
   <NotFound />
-{/if}
-<Posts />
+{/if} -->
+
+<Page />

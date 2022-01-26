@@ -1,9 +1,23 @@
 <script lang="ts">
-  import { router, hashs } from "@/Route";
+  import { router, hashs } from "@/assets/modules/Route";
   import { fly, blur } from "svelte/transition";
 
   let hash: boolean = false;
-  let apiHashs: Array<string> = ["#not", "#implemented", "#yet"];
+  let apiHashs: string[] = [
+    "#python",
+    "#js",
+    "#cpp",
+    "#go",
+    "#ps",
+    "#tensorflow",
+    "#react",
+    "#svelte",
+    "#aws",
+    "#cv",
+    "#java",
+    "#android",
+    "#linux",
+  ];
   function hashOver() {
     hash = true;
   }
