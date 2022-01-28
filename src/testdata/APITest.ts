@@ -30,6 +30,8 @@ export function testAPI(query: string, method: string, body: any = {}): any {
         return comment(query.slice(8), method, body);
     } else if (query.startsWith('/page')) {
         return page(query.slice(5), method);
+    } else if (query.startsWith('/length')) {
+        return length(query.slice(7), method);
     } else if (query.startsWith("/hashmap")) {
         return hashmap(query.slice(8), method);
     } else {
@@ -42,7 +44,7 @@ function post(query: string, method: string, body: any) {
     switch (method) {
         case "GET":
             for (let p of posts) {
-                if (p.id === query) {
+                if (p.id === query.slice(1)) {
                     return p;
                 }
             }
@@ -151,6 +153,36 @@ function page(query: string, method: string = 'GET') {
                 });
                 result.sort((a, b) => b.datetime - a.datetime);
                 return result.slice((page - 1) * pageCount, page * pageCount);
+            }
+        default:
+            throw new SyntaxError("Invalid method");
+    }
+}
+function length(query: string, method: string = 'GET') {
+    let tag: string = '';
+    const params = new URLSearchParams(query);
+    for (let entry of params.entries()) {
+        if (entry[0] === 'tag') {
+            tag = entry[1];
+        }
+    }
+
+    switch (method) {
+        case "GET":
+            if (tag === '') {
+                return posts.length;
+            } else {
+                const tagList: string[] = tag.split(",").map((elem) => elem + ",");
+                let result: Post[] = posts.filter((elem) => {
+                    let flag = true;
+                    for (let t of tagList) {
+                        if (!elem.hashs.includes(t)) {
+                            flag = false;
+                        }
+                    }
+                    return flag;
+                });
+                return result.length;
             }
         default:
             throw new SyntaxError("Invalid method");

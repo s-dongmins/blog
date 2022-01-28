@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { timeCalc } from "@/assets/modules/Utilities";
   interface Guestbook {
     mbti: string;
     name: string;
@@ -49,15 +50,6 @@
       (a: Guestbook, b: Guestbook) => b.datetime - a.datetime
     );
     guestbooks = items;
-  }
-  function timeCalc(timestamp: number) {
-    const date = new Date(timestamp);
-    return `${date.getFullYear() % 100}${
-      date.getMonth() + 1
-    }${date.getDate()} ${date
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   }
 </script>
 

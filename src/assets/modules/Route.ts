@@ -3,7 +3,7 @@ import { writable, Writable } from "svelte/store";
 
 export const routerMap = {
     root: "/",
-    aboutme: "/aboutme",
+    about: "/about",
     hash: "/hash",
     setting: "/setting",
 };

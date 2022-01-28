@@ -3,20 +3,30 @@
   import { testAPI } from "@/testdata/APITest";
   import type { Post } from "@/testdata/Post";
 
+  import { timeCalc } from "@/assets/modules/Utilities";
+  import { router } from "@/assets/modules/Route";
+
   let page: number = 1;
-  let pagebar: number[] = [page - 2, page - 1, page, page + 1, page + 2].filter(
-    (elem) => elem > 0
-  );
+  let length: number = 0;
   let posts: Post[] = [];
   let query: string = "/page";
-  $: query =
-    "/page?tag=" +
-    $hashs.map((elem) => elem.slice(1)).join(",") +
-    "&page=" +
-    page.toString();
-  console.log("testing");
-  console.log(query);
-  $: posts = testAPI(query, "GET");
+  let pagebar: number[] = [];
+  $: {
+    query =
+      "?tag=" +
+      $hashs.map((elem) => elem.slice(1)).join(",") +
+      "&page=" +
+      page.toString();
+    posts = testAPI("/page" + query, "GET");
+    length = testAPI("/length" + query, "GET");
+    pagebar = [page - 2, page - 1, page, page + 1, page + 2].filter(
+      (elem) => 0 < elem && elem <= Math.floor((length + 9) / 10)
+    );
+  }
+
+  function pageChange(num: number) {
+    page = num;
+  }
 
   function test() {
     console.log(query);
@@ -31,8 +41,9 @@
     align-items: center;
     width: 100%;
     .post {
-      width: 90%;
+      width: 70%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       margin: 1em;
@@ -44,26 +55,45 @@
         font-size: 1.25em;
       }
       .hashs {
+        font-size: 0.75em;
       }
-      .date {
+      .datetime {
         font-size: 0.75em;
         font-weight: 200;
         margin-top: 1em;
       }
     }
+    .page {
+      .num {
+        padding: 0.2em;
+      }
+      .selected {
+        background: #06041a;
+        border-radius: 100em;
+      }
+      margin-bottom: 2em;
+    }
   }
 </style>
 
 <div class="container">
-  <div on:click={test}><br /><br /><br /><br /><br /><br /><br />click me</div>
+  <div on:click={test}>result: {length}</div>
   {#each posts as post}
-    <a class="post" href="#">
+    <a class="post" href={'/' + post.id} on:click|preventDefault={router}>
       <div class="title">{post.title}</div>
-      <div class="hashs">{post.hashs}</div>
-      <div class="datetime">{post.datetime}</div>
+      <div class="hashs">
+        {'#' + post.hashs.slice(0, -1).split(',').join(' #')}
+      </div>
+      <div class="datetime">{timeCalc(post.datetime)}</div>
     </a>
   {/each}
   <div class="page">
-    {#each pagebar as num}<span class="num">{num}</span>{/each}
+    {#each pagebar as num}
+      {#if num == page}
+        <span class="num selected">{num}</span>
+      {:else}
+        <span class="num" on:click={() => pageChange(num)}>{num}</span>
+      {/if}
+    {/each}
   </div>
 </div>

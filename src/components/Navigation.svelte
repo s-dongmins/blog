@@ -70,7 +70,7 @@
 <div class="nav">
   <a class="home" href="/" on:click|preventDefault={router}>Dongmini</a>
   <div class="hash" on:focus={hashOver} on:mouseover={hashOver}>
-    <a class="button" href="/hash" on:click|preventDefault={router}>#</a>
+    <a class="button" href="/about" on:click|preventDefault={router}>#</a>
     {#if hash}
       <ul
         class="tagList"
