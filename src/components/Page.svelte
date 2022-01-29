@@ -47,9 +47,9 @@
       justify-content: center;
       align-items: center;
       margin: 1em;
-      border-radius: 2em;
-      box-shadow: 0 0 10px #171346;
-      height: 200px;
+      box-shadow: 2px 7px 5px #04031a;
+      height: 100px;
+      transition: all 0.3s ease-out;
       .title {
         text-align: center;
         font-size: 1.25em;
@@ -62,6 +62,11 @@
         font-weight: 200;
         margin-top: 1em;
       }
+    }
+    .post:hover {
+      background: #1c041f;
+      transform: translateY(-10px);
+      box-shadow: 3px 10px 15px rgba(#afa9ec, 0.3);
     }
     .page {
       .num {
@@ -77,7 +82,7 @@
 </style>
 
 <div class="container">
-  <div on:click={test}>result: {length}</div>
+  <div on:click={test}>{length === 0 ? 'No result' : `result: ${length}`}</div>
   {#each posts as post}
     <a class="post" href={'/' + post.id} on:click|preventDefault={router}>
       <div class="title">{post.title}</div>

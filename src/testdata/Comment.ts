@@ -42,7 +42,7 @@ function passwordGen(): string {
     return Math.random().toString(36).substr(2, 10);
 }
 function datetimeGen(): number {
-    return (new Date()).getTime() - randint(10000000);
+    return (new Date()).getTime() - randint(10000000000);
 }
 function mbtiGen(): string {
     return randint(3) ? '' : mbti[randint(16)];

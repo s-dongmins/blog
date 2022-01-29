@@ -87,6 +87,7 @@ function comment(query: string, method: string, body: any) {
                     temp.push(c);
                 }
             }
+            temp.sort((a, b) => b.datetime - a.datetime);
             return temp;
         case "POST":
             try {
@@ -159,6 +160,9 @@ function page(query: string, method: string = 'GET') {
     }
 }
 function length(query: string, method: string = 'GET') {
+    if (method !== 'GET') {
+        throw new SyntaxError("Invalid method");
+    }
     let tag: string = '';
     const params = new URLSearchParams(query);
     for (let entry of params.entries()) {
@@ -166,47 +170,61 @@ function length(query: string, method: string = 'GET') {
             tag = entry[1];
         }
     }
-
-    switch (method) {
-        case "GET":
-            if (tag === '') {
-                return posts.length;
-            } else {
-                const tagList: string[] = tag.split(",").map((elem) => elem + ",");
-                let result: Post[] = posts.filter((elem) => {
-                    let flag = true;
-                    for (let t of tagList) {
-                        if (!elem.hashs.includes(t)) {
-                            flag = false;
-                        }
-                    }
-                    return flag;
-                });
-                return result.length;
+    if (tag === '') {
+        return posts.length;
+    } else {
+        const tagList: string[] = tag.split(",").map((elem) => elem + ",");
+        let result: Post[] = posts.filter((elem) => {
+            let flag = true;
+            for (let t of tagList) {
+                if (!elem.hashs.includes(t)) {
+                    flag = false;
+                }
             }
-        default:
-            throw new SyntaxError("Invalid method");
+            return flag;
+        });
+        return result.length;
     }
 }
-//todo
+
 function hashmap(query: string, method: string = 'GET') {
-    let sel: string = '';
+    if (method !== 'GET') {
+        throw new SyntaxError("Invalid method");
+    }
+    let tag: string = '';
     const params = new URLSearchParams(query);
     for (let entry of params.entries()) {
-        if (entry[0] === 'sel') {
-            sel = entry[1];
+        if (entry[0] === 'tag') {
+            tag = entry[1];
         }
     }
-
-    switch (method) {
-        case "GET":
-            let hashmap: any = {};
-            let hashs: string[] = [];
-            for (let p of posts) {
-                hashs = p.hashs.split(",");
-
+    let count: any = {};
+    let hashs: string[] = [];
+    if (tag === '') {
+        for (let p of posts) {
+            hashs = p.hashs.slice(0, -1).split(",");
+            for (let h of hashs) {
+                count[h] = count[h] + 1 || 1;
             }
-        default:
-            throw new SyntaxError("Invalid method");
+        }
+    } else {
+        const tagList: string[] = tag.split(",").map((elem) => elem + ",");
+        for (let p of posts.filter((elem) => {
+            let flag = true;
+            for (let t of tagList) {
+                if (!elem.hashs.includes(t)) {
+                    flag = false;
+                }
+            }
+            return flag;
+        })) {
+            hashs = p.hashs.slice(0, -1).split(",");
+            for (let h of hashs) {
+                if (!tagList.includes(h + ',')) {
+                    count[h] = count[h] + 1 || 1;
+                }
+            }
+        }
     }
+    return count;
 }

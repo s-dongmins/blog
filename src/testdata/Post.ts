@@ -16,7 +16,7 @@ function idGen(): string {
     return Math.random().toString(36).substr(2, 6);
 }
 function datetimeGen(): number {
-    return (new Date()).getTime() - randint(10000000);
+    return (new Date()).getTime() - randint(10000000000);
 }
 function hashsGen(): string {
     hashList.sort(() => Math.random() - 0.5);

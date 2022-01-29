@@ -22,6 +22,7 @@ const hashsUnsubscriber = hashs.subscribe(hashs => {
 
 
 export function router(this: HTMLAnchorElement) {
+    window.scrollTo(0, 0);
     if (this.hash) {
         hashRouter.bind(this)();
     } else {

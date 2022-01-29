@@ -32,9 +32,6 @@
 </script>
 
 <style lang="scss">
-  .gap {
-    height: 4em;
-  }
   .color1 {
     position: fixed;
     filter: blur(500px);
@@ -64,7 +61,7 @@
 
 <Navigation />
 
-<div class="gap" />
+<!-- <div class="gap" /> -->
 {#if $path[0] === routerMap.root}
   {#if $hashs.length === 0}
     <Root />

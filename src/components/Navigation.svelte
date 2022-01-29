@@ -1,23 +1,16 @@
 <script lang="ts">
-  import { router, hashs } from "@/assets/modules/Route";
   import { fly, blur } from "svelte/transition";
 
+  import { router, hashs } from "@/assets/modules/Route";
+  import { testAPI } from "@/testdata/APITest";
+
   let hash: boolean = false;
-  let apiHashs: string[] = [
-    "#python",
-    "#js",
-    "#cpp",
-    "#go",
-    "#ps",
-    "#tensorflow",
-    "#react",
-    "#svelte",
-    "#aws",
-    "#cv",
-    "#java",
-    "#android",
-    "#linux",
-  ];
+  let apiHashs: any;
+  let query: string = "";
+  $: {
+    query = "/hashmap?tag=" + $hashs.map((elem) => elem.slice(1)).join(",");
+    apiHashs = testAPI(query, "GET");
+  }
   function hashOver() {
     hash = true;
   }
@@ -29,7 +22,8 @@
 <style lang="scss">
   .nav {
     display: flex;
-    position: fixed;
+    position: sticky;
+    top: 0;
     justify-content: center;
     align-items: center;
     padding: 1em 2em;
@@ -60,10 +54,17 @@
     }
   }
   .tag {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     padding: 0.7em;
     margin: 0.3em;
     box-shadow: 0 0 10px #171346;
     border-radius: 2em;
+    .count {
+      font-size: 0.5em;
+    }
   }
 </style>
 
@@ -77,8 +78,11 @@
         in:fly={{ y: 50, duration: 1000 }}
         out:blur={{ duration: 1000 }}
         on:mouseleave={hashOut}>
-        {#each apiHashs.filter((elem) => !$hashs.includes(elem)) as h}
-          <a class="tag" href={h} on:click|preventDefault={router}>{h}</a>
+        {#each Object.keys(apiHashs) as h}
+          <a class="tag" href={'#' + h} on:click|preventDefault={router}>
+            <div>#{h}</div>
+            <div class="count">{apiHashs[h]}</div>
+          </a>
         {/each}
       </ul>
     {/if}
