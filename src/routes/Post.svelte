@@ -17,24 +17,63 @@
 </script>
 
 <style lang="scss">
+  .component {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    .post {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      margin: 2em;
+      .title {
+        font-size: 3em;
+      }
+      .datetime,
+      .hashs,
+      .views {
+        background: #06041a;
+        padding: 0.5em;
+        border-radius: 100em;
+        color: #999;
+      }
+      .comment {
+        margin: 1em;
+        .datetime,
+        .ip,
+        .name,
+        .mbti,
+        .email {
+          background: #06041a;
+          padding: 0.5em;
+          border-radius: 100em;
+          color: #999;
+          font-size: 0.5em;
+        }
+      }
+    }
+  }
 </style>
 
 <div class="component">
   <div class="post">
-    <h1>{post.title}</h1>
-    <div>{timeCalc(post.datetime)}</div>
-    <div>{post.hashs}</div>
-    <div>{post.views}</div>
-    <div>{post.content}</div>
-  </div>
-  {#each comments as comment}
-    <div class="comment">
-      <span>{timeCalc(comment.datetime)}</span>
-      <span>{comment.mbti}</span>
-      <span>{comment.name}</span>
-      <span>{comment.email}</span>
-      <span>{comment.ip}</span>
-      <span>{comment.content}</span>
+    <h1 class="title">{post.title}</h1>
+    <div class="datetime">{timeCalc(post.datetime)}</div>
+    <div class="hashs">
+      {'#' + post.hashs.slice(0, -1).split(',').join(' #')}
     </div>
-  {/each}
+    <div class="views">View: {post.views}</div>
+    <div class="content">{post.content}</div>
+    {#each comments as comment}
+      <div class="comment">
+        <span class="datetime">{timeCalc(comment.datetime)}</span>
+        <span class="ip">{comment.ip}</span>
+        <span class="name">{comment.name}</span>
+        <span class="mbti">{comment.mbti}</span>
+        <span class="email">{comment.email}</span>
+        <span class="content">{comment.content}</span>
+      </div>
+    {/each}
+  </div>
 </div>

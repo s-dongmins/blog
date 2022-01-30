@@ -37,33 +37,34 @@
       position: absolute;
       left: 2em;
     }
-    .list {
-      position: absolute;
-      right: 2em;
-    }
     .hash {
-      .button {
-        font-size: 2em;
-        cursor: pointer;
-      }
+      font-size: 2em;
       .tagList {
         position: absolute;
         transform: translateX(-50%);
         display: flex;
+        .tag {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          font-size: 1rem;
+          padding: 0.7em;
+          margin: 0.3em;
+          background: rgba(#000, 0.2);
+          box-shadow: 0 0 10px #171346;
+          border-radius: 2em;
+          backdrop-filter: blur(3px);
+          .count {
+            font-size: 0.5em;
+          }
+        }
       }
     }
-  }
-  .tag {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0.7em;
-    margin: 0.3em;
-    box-shadow: 0 0 10px #171346;
-    border-radius: 2em;
-    .count {
-      font-size: 0.5em;
+    .list {
+      position: absolute;
+      display: flex;
+      right: 2em;
     }
   }
 </style>
@@ -71,8 +72,7 @@
 <div class="nav">
   <a class="home" href="/" on:click|preventDefault={router}>Dongmini</a>
   <div class="hash" on:focus={hashOver} on:mouseover={hashOver}>
-    <a class="button" href="/about" on:click|preventDefault={router}>#</a>
-    {#if hash}
+    # {#if hash}
       <ul
         class="tagList"
         in:fly={{ y: 50, duration: 1000 }}
