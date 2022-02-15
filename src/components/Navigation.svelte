@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { fly, blur } from "svelte/transition";
+  import { fly, scale } from "svelte/transition";
+  import { flip } from "svelte/animate";
 
   import { router, hashs } from "@/assets/modules/Route";
   import { testAPI } from "@/testdata/APITest";
@@ -76,10 +77,14 @@
       <ul
         class="tagList"
         in:fly={{ y: 50, duration: 1000 }}
-        out:blur={{ duration: 1000 }}
         on:mouseleave={hashOut}>
-        {#each Object.keys(apiHashs) as h}
-          <a class="tag" href={'#' + h} on:click|preventDefault={router}>
+        {#each Object.keys(apiHashs) as h (h)}
+          <a
+            class="tag"
+            href={'#' + h}
+            transition:scale
+            animate:flip={{ duration: 1000 }}
+            on:click|preventDefault={router}>
             <div>#{h}</div>
             <div class="count">{apiHashs[h]}</div>
           </a>

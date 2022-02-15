@@ -9,10 +9,10 @@ export interface Comment {
     reply: string;
     admin: boolean;
     datetime: number;
+    ip: string;
     mbti: string;
     name: string;
     email: string;
-    ip: string;
     content: string;
 }
 const mbti: string[] = [
@@ -44,17 +44,17 @@ function passwordGen(): string {
 function datetimeGen(): number {
     return (new Date()).getTime() - randint(10000000000);
 }
+function ipGen(): string {
+    return `${randint(255)}.${randint(255)}.${randint(255)}.${randint(255)}`;
+}
 function mbtiGen(): string {
-    return randint(3) ? '' : mbti[randint(16)];
+    return randint(3) ? 'MBTI' : mbti[randint(16)];
 }
 function nameGen(): string {
     return randint(4) ? name[randint(name.length)] : 'anonym';
 }
 function emailGen(): string {
     return randint(10) ? '' : email[randint(email.length)];
-}
-function ipGen(): string {
-    return `${randint(255)}.${randint(255)}.${randint(255)}.${randint(255)}`;
 }
 function contentGen(): string {
     return comment[randint(comment.length)];
@@ -70,10 +70,10 @@ export function CommentGenerator(num: number, posts: Post[]): Comment[] {
             reply: randint(4) ? '' : result[randint(result.length)].id,
             admin: false,
             datetime: datetimeGen(),
+            ip: ipGen(),
             mbti: mbtiGen(),
             name: nameGen(),
             email: emailGen(),
-            ip: ipGen(),
             content: contentGen()
         };
         result.push(temp);
