@@ -3,22 +3,55 @@
   import { flip } from "svelte/animate";
 
   import { router, hashs } from "@/assets/modules/Route";
+  import { hashmapGET } from "@/assets/modules/Api";
+  import type { HashCount } from "@/assets/modules/Api";
   import { testAPI } from "@/testdata/APITest";
 
-  let hash: boolean = false;
-  let apiHashs: any;
-  let query: string = "";
+  let hashFlag: boolean = false;
+  let apiHashs: Promise<HashCount>;
   $: {
-    query = "/hashmap?tag=" + $hashs.map((elem) => elem.slice(1)).join(",");
-    apiHashs = testAPI(query, "GET");
+    apiHashs = hashmapGET($hashs.map((elem) => elem.slice(1)).join(","));
   }
   function hashOver() {
-    hash = true;
+    hashFlag = true;
   }
   function hashOut() {
-    hash = false;
+    hashFlag = false;
   }
 </script>
+
+<div class="nav">
+  <a class="home" href="/" on:click|preventDefault={router}>Dongmini</a>
+  <div class="hash" on:focus={hashOver} on:mouseover={hashOver}>
+    # {#if hashFlag}
+      {#await apiHashs then apiHashs}
+        <ul
+          class="tagList"
+          in:fly={{ y: 50, duration: 1000 }}
+          on:mouseleave={hashOut}
+        >
+          {#each Object.keys(apiHashs) as h (h)}
+            <a
+              class="tag"
+              href={"#" + h}
+              transition:scale
+              animate:flip={{ duration: 1000 }}
+              on:click|preventDefault={router}
+            >
+              <div>#{h}</div>
+              <div class="count">{apiHashs[h]}</div>
+            </a>
+          {/each}
+        </ul>
+      {/await}
+    {/if}
+  </div>
+  <div class="list">
+    {#each $hashs as h}
+      <a class="tag" href={h} on:click|preventDefault={router}>{h}</a>
+    {/each}
+  </div>
+</div>
 
 <style lang="scss">
   .nav {
@@ -69,32 +102,3 @@
     }
   }
 </style>
-
-<div class="nav">
-  <a class="home" href="/" on:click|preventDefault={router}>Dongmini</a>
-  <div class="hash" on:focus={hashOver} on:mouseover={hashOver}>
-    # {#if hash}
-      <ul
-        class="tagList"
-        in:fly={{ y: 50, duration: 1000 }}
-        on:mouseleave={hashOut}>
-        {#each Object.keys(apiHashs) as h (h)}
-          <a
-            class="tag"
-            href={'#' + h}
-            transition:scale
-            animate:flip={{ duration: 1000 }}
-            on:click|preventDefault={router}>
-            <div>#{h}</div>
-            <div class="count">{apiHashs[h]}</div>
-          </a>
-        {/each}
-      </ul>
-    {/if}
-  </div>
-  <div class="list">
-    {#each $hashs as h}
-      <a class="tag" href={h} on:click|preventDefault={router}>{h}</a>
-    {/each}
-  </div>
-</div>

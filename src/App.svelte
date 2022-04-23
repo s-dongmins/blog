@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { router, routerMap } from "@/assets/modules/Route";
+  import { routerMap } from "@/assets/modules/Route";
   import { path } from "@/assets/modules/Route";
   import { hashs } from "@/assets/modules/Route";
 
@@ -31,6 +31,24 @@
   });
 </script>
 
+<div class="color1" />
+<div class="color2" />
+
+<Navigation />
+
+<!-- <div class="gap" /> -->
+{#if $path[0] === routerMap.root}
+  {#if $hashs.length === 0}
+    <Root />
+  {/if}
+{:else if $path[0] === routerMap.about}
+  <About />
+{:else}
+  <Post />
+{/if}
+
+<Page />
+
 <style lang="scss">
   .color1 {
     position: fixed;
@@ -55,21 +73,3 @@
     background: #3f043c;
   }
 </style>
-
-<div class="color1" />
-<div class="color2" />
-
-<Navigation />
-
-<!-- <div class="gap" /> -->
-{#if $path[0] === routerMap.root}
-  {#if $hashs.length === 0}
-    <Root />
-  {/if}
-{:else if $path[0] === routerMap.about}
-  <About />
-{:else}
-  <Post />
-{/if}
-
-<Page />

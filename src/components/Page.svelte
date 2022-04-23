@@ -5,29 +5,62 @@
 
   import { timeCalc } from "@/assets/modules/Utilities";
   import { router } from "@/assets/modules/Route";
+  import { postSCAN, postLENGTH } from "@/assets/modules/Api";
 
   let page: number = 1;
-  let length: number = 0;
-  let posts: Post[] = [];
-  let query: string = "/page";
-  let pagebar: number[] = [];
+  let posts: Promise<Post[]>;
+  let length: Promise<number>;
+  let pagebar: Promise<number[]>;
   $: {
-    query =
-      "?tag=" +
-      $hashs.map((elem) => elem.slice(1)).join(",") +
-      "&page=" +
-      page.toString();
-    posts = testAPI("/page" + query, "GET");
-    length = testAPI("/length" + query, "GET");
-    pagebar = [page - 2, page - 1, page, page + 1, page + 2].filter(
-      (elem) => 0 < elem && elem <= Math.floor((length + 9) / 10)
-    );
+    posts = postSCAN(page, $hashs.map((elem) => elem.slice(1)).join(","));
+    length = postLENGTH($hashs.map((elem) => elem.slice(1)).join(","));
+    pagebar = pagebarGen();
+  }
+  async function pagebarGen() {
+    let temp = [page - 2, page - 1, page, page + 1, page + 2];
+    const l = await length;
+    temp = temp.filter((elem) => 0 < elem && elem <= Math.floor((l + 9) / 10));
+    return temp;
   }
 
   function pageChange(num: number) {
     page = num;
   }
 </script>
+
+<div class="container">
+  {#await length then length}
+    <div class="result">{length === 0 ? "No result" : `result: ${length}`}</div>
+  {/await}
+  {#await posts}
+    <p>Waiting...</p>
+  {:then posts}
+    {#each posts as post}
+      <a
+        class="post {post.id === $path[0].slice(1) ? 'selected' : ''}"
+        href={"/" + post.id}
+        on:click|preventDefault={router}
+      >
+        <div class="title">{post.title}</div>
+        <div class="hashs">
+          {"#" + post.hashs.slice(0, -1).split(",").join(" #")}
+        </div>
+        <div class="datetime">{timeCalc(post.datetime)}</div>
+      </a>
+    {/each}
+  {/await}
+  {#await pagebar then pagebar}
+    <div class="page">
+      {#each pagebar as num}
+        {#if num == page}
+          <span class="num location">{num}</span>
+        {:else}
+          <span class="num" on:click={() => pageChange(num)}>{num}</span>
+        {/if}
+      {/each}
+    </div>
+  {/await}
+</div>
 
 <style lang="scss">
   .container {
@@ -74,6 +107,7 @@
     }
     .page {
       margin: 4em;
+      cursor: pointer;
       .num {
         padding: 1em;
         height: 2em;
@@ -87,28 +121,3 @@
     }
   }
 </style>
-
-<div class="container">
-  <div class="result">{length === 0 ? 'No result' : `result: ${length}`}</div>
-  {#each posts as post}
-    <a
-      class="post {post.id === $path[0].slice(1) ? 'selected' : ''}"
-      href={'/' + post.id}
-      on:click|preventDefault={router}>
-      <div class="title">{post.title}</div>
-      <div class="hashs">
-        {'#' + post.hashs.slice(0, -1).split(',').join(' #')}
-      </div>
-      <div class="datetime">{timeCalc(post.datetime)}</div>
-    </a>
-  {/each}
-  <div class="page">
-    {#each pagebar as num}
-      {#if num == page}
-        <span class="num location">{num}</span>
-      {:else}
-        <span class="num" on:click={() => pageChange(num)}>{num}</span>
-      {/if}
-    {/each}
-  </div>
-</div>
