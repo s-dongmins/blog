@@ -22,7 +22,12 @@
 
 <div class="nav">
   <a class="home" href="/" on:click|preventDefault={router}>Dongmini</a>
-  <div class="hash" on:focus={hashOver} on:mouseover={hashOver}>
+  <div
+    class="hash"
+    on:focus={hashOver}
+    on:mouseover={hashOver}
+    on:click={hashOut}
+  >
     # {#if hashFlag}
       {#await apiHashs then apiHashs}
         <ul
@@ -72,6 +77,7 @@
       left: 2em;
     }
     .hash {
+      cursor: pointer;
       font-size: 2em;
       .tagList {
         position: absolute;

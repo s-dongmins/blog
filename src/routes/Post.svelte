@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { testAPI } from "@/testdata/APITest";
-  // import type { Post } from "@/testdata/Post";
-  // import type { Comment } from "@/testdata/Comment";
-
   import { timeCalc } from "@/assets/modules/Utilities";
   import { path } from "@/assets/modules/Route";
   import {
@@ -12,7 +8,6 @@
     commentDELETE,
   } from "@/assets/modules/Api";
   import type { Post, Comment } from "@/assets/modules/Api";
-  import { comment } from "@/testdata/FakeData";
 
   let postID: string;
   let post: Promise<Post>;
@@ -28,6 +23,9 @@
   let email: string;
   let content: string;
   let password: string;
+  let deleteTarget: string = "";
+  let deletePassword: string = "";
+
   function handleSubmit() {
     name = name ?? "";
     email = email ?? "";
@@ -39,7 +37,7 @@
     } else if (!content) {
       alert("Please enter the content.");
     } else {
-      commentPOST(postID, content, mbti, name, email);
+      commentPOST(postID, content, mbti, name, email, password);
       setTimeout(() => {
         comments = commentGET(postID);
       }, 1000);
@@ -49,6 +47,21 @@
       content = "";
       password = "";
     }
+  }
+  async function handleDelete() {
+    if (await commentDELETE(postID, deleteTarget, deletePassword)) {
+      setTimeout(() => {
+        comments = commentGET(postID);
+      }, 1000);
+      deletePassword = "";
+      deleteTarget = "";
+    } else {
+      alert("Password is Wrong!");
+    }
+  }
+  function targetSwitch(id: string) {
+    deleteTarget = id;
+    deletePassword = "";
   }
 </script>
 
@@ -74,12 +87,33 @@
         <div class="comment">
           <span class="datetime">{timeCalc(comment.datetime)}</span>
           <span class="ip">{comment.ip}</span>
-          <span class="name">{comment.name}</span>
+          {#if comment.admin}
+            <span class="admin">{comment.name}</span>
+          {:else}
+            <span class="name">{comment.name}</span>
+          {/if}
           {#if comment.mbti !== "MBTI"}
             <span class="mbti">{comment.mbti}</span>
           {/if}
           {#if comment.email}<span class="email">{comment.email}</span>{/if}
           <span class="content">{comment.content}</span>
+          {#if deleteTarget === comment.id}
+            <form class="delete-field" on:submit|preventDefault={handleDelete}>
+              <input
+                type="password"
+                id="delete"
+                name="delete"
+                placeholder="please input password"
+                bind:value={deletePassword}
+              />
+              <input id="delete-submit" type="submit" value="submit" />
+            </form>
+          {:else}
+            <button
+              class="delete-button"
+              on:click={() => targetSwitch(comment.id)}>Delete</button
+            >
+          {/if}
         </div>
       {/each}
     {/await}
@@ -182,6 +216,30 @@
           border-radius: 100em;
           color: #999;
           font-size: 0.5em;
+        }
+        .admin {
+          background: #5a0808;
+          padding: 0.5em;
+          border-radius: 100em;
+          color: #999;
+          font-size: 0.5em;
+        }
+        #delete {
+          background: #06041a;
+          border: none;
+          color: #fff;
+          font-family: inherit;
+          width: 14em;
+          padding-left: 0.5em;
+          margin-right: 0.5em;
+        }
+        #delete-submit,
+        .delete-button {
+          background: #06041a;
+          border: none;
+          border-radius: 100em;
+          color: #fff;
+          font-family: inherit;
         }
       }
     }

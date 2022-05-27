@@ -36,7 +36,6 @@
 
 <Navigation />
 
-<!-- <div class="gap" /> -->
 {#if $path[0] === routerMap.root}
   {#if $hashs.length === 0}
     <Root />

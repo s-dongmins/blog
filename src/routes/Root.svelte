@@ -1,57 +1,133 @@
 <script lang="ts">
   import { timeCalc } from "@/assets/modules/Utilities";
-  interface Guestbook {
-    mbti: string;
-    name: string;
-    note: string;
-    datetime: number;
-    id: string;
-  }
+  import { commentGET, commentPOST } from "@/assets/modules/Api";
+  import type { Comment } from "@/assets/modules/Api";
 
   let mbti: string;
   let name: string;
-  let note: string;
-  let guestbooks: Guestbook[] = [];
-  guestbookGET();
+  let content: string;
+  let password: string;
+  let guestbooks: Promise<Comment[]> = commentGET("guestbook");
   function handleSubmit() {
     name = name ?? "";
-    if (name.length > 10) {
+    password = password ?? "";
+    if (!password) {
+      alert("Please enter the password");
+    } else if (name.length > 10) {
       alert("Name is limited to 10 characters or less.");
-    } else if (!note) {
+    } else if (!content) {
       alert("Please enter the content.");
     } else {
-      guestbookPOST();
+      commentPOST("guestbook", content, mbti, name, "", password);
+      setTimeout(() => {
+        guestbooks = commentGET("guestbook");
+      }, 1000);
       mbti = "MBTI";
       name = "";
-      note = "";
+      content = "";
+      password = "";
     }
   }
-  async function guestbookPOST() {
-    const headers = new Headers({
-      "Content-Type": "application/json",
-    });
-    const raw = JSON.stringify({ mbti: mbti, name: name, note: note });
-    const requestOptions: RequestInit = {
-      method: "POST",
-      headers: headers,
-      body: raw,
-      redirect: "follow",
-    };
-    const request = await fetch(
-      "https://api.dongmini.net/guestbook",
-      requestOptions
-    );
-    guestbooks = [await request.json(), ...guestbooks];
-  }
-  async function guestbookGET() {
-    const response = await fetch("https://api.dongmini.net/guestbook");
-    const json = await response.json();
-    const items: Guestbook[] = json.Items.sort(
-      (a: Guestbook, b: Guestbook) => b.datetime - a.datetime
-    );
-    guestbooks = items;
-  }
 </script>
+
+<div class="component">
+  <div class="card">
+    <img class="profile" src="/profile.jpg" alt="Profile" />
+    <div class="text">
+      <div class="name">Shin Dongmini</div>
+      <div class="bio">Next time, I'll be the lead.</div>
+      <ul class="sci">
+        <li>
+          <a
+            href="https://facebook.com/people/%EC%8B%A0%EB%8F%99%EB%AF%BC/100004892382680/"
+            ><i class="fa-brands fa-facebook-f" /></a
+          >
+        </li>
+        <li>
+          <a href="https://github.com/s-dongmini"
+            ><i class="fa-brands fa-github" /></a
+          >
+        </li>
+        <li>
+          <a href="https://instagram.com/s.dongmini/"
+            ><i class="fa-brands fa-instagram" /></a
+          >
+        </li>
+      </ul>
+      <div class="email">dongmin.shin00@gmail.com</div>
+    </div>
+  </div>
+  <form class="guestbook" on:submit|preventDefault={handleSubmit}>
+    <div class="info">
+      <select id="mbti" name="mbti" bind:value={mbti}>
+        <option value="MBTI" selected>MBTI</option>
+        <option value="ESTJ">ESTJ</option>
+        <option value="ESFJ">ESFJ</option>
+        <option value="ENFJ">ENFJ</option>
+        <option value="ENTJ">ENTJ</option>
+        <option value="ESTP">ESTP</option>
+        <option value="ESFP">ESFP</option>
+        <option value="ENFP">ENFP</option>
+        <option value="ENTP">ENTP</option>
+        <option value="ISTP">ISTP</option>
+        <option value="ISFP">ISFP</option>
+        <option value="INFP">INFP</option>
+        <option value="INTP">INTP</option>
+        <option value="ISTJ">ISTJ</option>
+        <option value="ISFJ">ISFJ</option>
+        <option value="INFJ">INFJ</option>
+        <option value="INTJ">INTJ</option>
+      </select>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="name"
+        bind:value={name}
+      />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="password"
+        bind:value={password}
+      />
+    </div>
+    <div class="field">
+      <input
+        type="text"
+        id="content"
+        name="content"
+        placeholder="Tell anything to me!"
+        bind:value={content}
+      />
+      <input id="submit" type="submit" value="submit" />
+    </div>
+  </form>
+
+  <div class="comments">
+    {#await guestbooks}
+      <p>Waiting...</p>
+    {:then guestbooks}
+      {#each guestbooks as guestbook}
+        <div class="comment">
+          {#if guestbook.mbti != "MBTI"}
+            <span class="mbti">{guestbook.mbti}</span>
+          {/if}
+          {#if guestbook.admin}
+            <span class="admin">{guestbook.name}</span>
+          {:else}
+            <span class="name">{guestbook.name}</span>
+          {/if}
+          <span class="content">{guestbook.content}</span>
+          <span class="datetime">{timeCalc(guestbook.datetime)}</span>
+        </div>
+      {/each}
+    {:catch}
+      <p>error occurred :(</p>
+    {/await}
+  </div>
+</div>
 
 <style lang="scss">
   .component {
@@ -145,19 +221,21 @@
           margin-right: 0.5em;
           text-align: center;
         }
-        #name {
+        #name,
+        #password {
           background: #06041a;
           border: none;
           color: #fff;
           font-family: inherit;
           width: 7em;
           padding-left: 0.5em;
+          margin-right: 0.5em;
         }
       }
       .field {
         display: flex;
         width: 100%;
-        #note {
+        #content {
           background: #06041a;
           border: none;
           color: #fff;
@@ -175,14 +253,14 @@
         }
       }
     }
-    .notes::-webkit-scrollbar {
+    .comments::-webkit-scrollbar {
       width: 6px;
     }
-    .notes::-webkit-scrollbar-thumb {
+    .comments::-webkit-scrollbar-thumb {
       background: #3f043c;
       border-radius: 20px;
     }
-    .notes {
+    .comments {
       width: 80%;
       height: 10em;
       overflow-y: scroll;
@@ -191,28 +269,35 @@
       align-items: center;
       text-align: center;
       margin-bottom: 2em;
-      .post {
+      .comment {
         margin: 0.5em;
-        .p_mbti {
+        .mbti {
           background: #06041a;
           padding: 0.5em;
           border-radius: 100em;
           font-size: 0.7em;
           color: #999;
         }
-        .p_name {
+        .admin {
+          background: #5a0808;
+          padding: 0.5em;
+          border-radius: 100em;
+          font-size: 0.7em;
+          color: #999;
+        }
+        .name {
           background: #06041a;
           padding: 0.5em;
           border-radius: 100em;
           font-size: 0.7em;
           color: #999;
         }
-        .p_note {
+        .content {
           background: #06041a;
           padding: 0.5em;
           line-height: 2em;
         }
-        .p_datetime {
+        .datetime {
           background: #06041a;
           padding: 0.5em;
           border-radius: 100em;
@@ -223,86 +308,3 @@
     }
   }
 </style>
-
-<div class="component">
-  <div class="card">
-    <img class="profile" src="profile.jpg" alt="Profile" />
-    <div class="text">
-      <div class="name">Shin Dongmini</div>
-      <div class="bio">Next time, I'll be the lead.</div>
-      <ul class="sci">
-        <li>
-          <a
-            href="https://facebook.com/people/%EC%8B%A0%EB%8F%99%EB%AF%BC/100004892382680/"><i
-              class="fa-brands fa-facebook-f" /></a>
-        </li>
-        <li>
-          <a href="https://github.com/s-dongmini"><i
-              class="fa-brands fa-github" /></a>
-        </li>
-        <li>
-          <a href="https://instagram.com/s.dongmini/"><i
-              class="fa-brands fa-instagram" /></a>
-        </li>
-      </ul>
-      <div class="email">dongmin.shin00@gmail.com</div>
-    </div>
-    <form class="guestbook" on:submit|preventDefault={handleSubmit}>
-      <div class="info">
-        <select id="mbti" name="mbti" class="mbti" bind:value={mbti}>
-          <option value="MBTI" selected>MBTI</option>
-          <option value="ESTJ">ESTJ</option>
-          <option value="ESFJ">ESFJ</option>
-          <option value="ENFJ">ENFJ</option>
-          <option value="ENTJ">ENTJ</option>
-          <option value="ESTP">ESTP</option>
-          <option value="ESFP">ESFP</option>
-          <option value="ENFP">ENFP</option>
-          <option value="ENTP">ENTP</option>
-          <option value="ISTP">ISTP</option>
-          <option value="ISFP">ISFP</option>
-          <option value="INFP">INFP</option>
-          <option value="INTP">INTP</option>
-          <option value="ISTJ">ISTJ</option>
-          <option value="ISFJ">ISFJ</option>
-          <option value="INFJ">INFJ</option>
-          <option value="INTJ">INTJ</option>
-        </select>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          placeholder="name"
-          bind:value={name} />
-      </div>
-      <div class="field">
-        <input
-          type="text"
-          id="note"
-          name="note"
-          placeholder="Tell anything to me!"
-          bind:value={note} />
-        <input id="submit" type="submit" value="submit" />
-      </div>
-    </form>
-  </div>
-
-  <div class="notes">
-    {#await guestbooks}
-      <p>Waiting...</p>
-    {:then guestbooks}
-      {#each guestbooks as guestbook}
-        <div class="post">
-          {#if guestbook.mbti != 'MBTI'}
-            <span class="p_mbti">{guestbook.mbti}</span>
-          {/if}
-          <span class="p_name">{guestbook.name}</span>
-          <span class="p_note">{guestbook.note}</span>
-          <span class="p_datetime">{timeCalc(guestbook.datetime)}</span>
-        </div>
-      {/each}
-    {:catch}
-      <p>error occurred :(</p>
-    {/await}
-  </div>
-</div>

@@ -31,11 +31,11 @@ export async function commentGET(key: string) {
     return items;
 }
 
-export async function commentPOST(key: string, content: string, mbti: string = "MBTI", name: string = "", email: string = "") {
+export async function commentPOST(key: string, content: string, mbti: string = "MBTI", name: string = "", email: string = "", password: string) {
     const headers = new Headers({
         "Content-Type": "application/json",
     });
-    const raw = JSON.stringify({ mbti: mbti, name: name, email: email, content: content });
+    const raw = JSON.stringify({ mbti: mbti, name: name, email: email, content: content, password: password });
     const requestOptions: RequestInit = {
         method: "POST",
         headers: headers,
@@ -53,8 +53,8 @@ export async function commentPOST(key: string, content: string, mbti: string = "
 
 export async function commentDELETE(key: string, id: string, password: string) {
     const response = await fetch(apiURL + `comment/${key}/${id}/${password}`, { method: "DELETE" });
-    const json = await response.json();
-    if (json.statusCode === 400) {
+    const status = response.status;
+    if (status === 400) {
         return false;
     } else {
         return true;

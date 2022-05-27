@@ -30,6 +30,6 @@
     "validate": "svelte-check"
   },
   "dependencies": {
-    "marked": "^3.0.4"
+    "marked": "^3.0.8"
   }
 }
